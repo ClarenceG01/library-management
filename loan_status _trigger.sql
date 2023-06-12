@@ -1,0 +1,20 @@
+CREATE TRIGGER updateStatus
+ON Loans
+AFTER INSERT,UPDATE,DELETE
+NOT FOR REPLICATION
+AS
+BEGIN 
+	UPDATE Books
+	SET Status='Loaned'
+	WHERE BookID IN (SELECT BookID FROM inserted);
+
+	UPDATE Books
+	SET Status='Available'
+	WHERE BookID IN (SELECT BookID FROM deleted);
+END;
+
+--TEST TRIGGER
+INSERT INTO Loans(LoansID,BookID,MemberID,LoanDate,ReturnDate)
+VALUES (8,3,2,'2023-06-01','2023-06-21');
+
+SELECT * FROM Books;
